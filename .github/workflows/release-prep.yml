@@ -34,7 +34,6 @@ jobs:
                 VERSION: ${{ github.event.inputs.release_version }}
             run: |
                 git checkout -b pre-release/${{ env.VERSION }}
-                git push origin pre-release/${{ env.VERSION }}
 
                 # Split version number into major, minor, and micro
                 MAYOR=$(echo $VERSION | cut -d. -f1)
@@ -46,6 +45,14 @@ jobs:
                 sed -i "s/minor: int = \([0-9]\+\)/minor: int = $MINOR/g" heat/core/version.py
                 sed -i "s/micro: int = \([0-9]\+\)/micro: int = $MICRO/g" heat/core/version.py
                 sed -i "s/extension: str = .*/extension: str = None/g" heat/core/version.py
+                
+                # Add and commit the changes
+                git add heat/core/version.py
+                git commit -m "Bump version to $VERSION"
+
+
+                # Push the changes
+                git push origin pre-release/${{ env.VERSION }} --set-upstream origin pre-release/${{ env.VERSION }}
                 
           - name: Create PR to release from branch
             uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
