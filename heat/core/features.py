@@ -1,1 +1,1 @@
-features = [1]
+features = [1, 2]
