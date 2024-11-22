@@ -33,8 +33,6 @@ jobs:
             env:
                 VERSION: ${{ github.event.inputs.release_version }}
             run: |
-                git checkout -b pre-release/${{ env.VERSION }}
-
                 # Split version number into major, minor, and micro
                 MAYOR=$(echo $VERSION | cut -d. -f1)
                 MINOR=$(echo $VERSION | cut -d. -f2)
