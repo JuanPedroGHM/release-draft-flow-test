@@ -52,7 +52,7 @@ jobs:
 
 
                 # Push the changes
-                git push origin pre-release/${{ env.VERSION }} --set-upstream origin pre-release/${{ env.VERSION }}
+                git push origin --set-upstream pre-release/${{ env.VERSION }}
                 
           - name: Create PR to release from branch
             uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
