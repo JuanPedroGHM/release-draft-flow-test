@@ -46,6 +46,10 @@ jobs:
                 sed -i "s/micro: int = \([0-9]\+\)/micro: int = $MICRO/g" heat/core/version.py
                 sed -i "s/extension: str = .*/extension: str = None/g" heat/core/version.py
                 
+                # Setup git config
+                git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+                git config --global user.name "${{ github.actor }}"
+
                 # Add and commit the changes
                 git add heat/core/version.py
                 git commit -m "Bump version to $VERSION"
