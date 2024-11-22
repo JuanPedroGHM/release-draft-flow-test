@@ -1,0 +1,96 @@
+name: Prep Heat Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_version:
+                description: 'The version to release'
+                required: true
+                default: '0.0.0'
+            base_branch:
+                description: 'The base branch to create the release branch from'
+                required: true
+                default: 'main'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+    release:
+        # environment: release
+        runs-on: ubuntu-latest
+        steps:
+          - name: Harden Runner
+            uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+            with:
+                egress-policy: audit
+
+          - uses: actions/checkout@v4
+            with:
+                ref: ${{ github.event.inputs.base_branch }}
+          - name: Create Release Branch with new version number
+            env:
+                VERSION: ${{ github.event.inputs.release_version }}
+            run: |
+                git checkout -b pre-release/${{ env.VERSION }}
+                git push origin pre-release/${{ env.VERSION }}
+
+                # Split version number into major, minor, and micro
+                MAYOR=$(echo $VERSION | cut -d. -f1)
+                MINOR=$(echo $VERSION | cut -d. -f2)
+                MICRO=$(echo $VERSION | cut -d. -f3)
+
+                # Write on to the version.py file
+                sed -i "s/major: int = \([0-9]\+\)/major: int = $MAYOR/g" heat/core/version.py
+                sed -i "s/minor: int = \([0-9]\+\)/minor: int = $MINOR/g" heat/core/version.py
+                sed -i "s/micro: int = \([0-9]\+\)/micro: int = $MICRO/g" heat/core/version.py
+                sed -i "s/extension: str = .*/extension: str = None/g" heat/core/version.py
+                
+          - name: Create PR to release from branch
+            uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+            with:
+                base: 'release'
+                branch: ${{ env.PR_BRANCH}}
+                delete-branch: true
+                token: ${{ secrets.GITHUB_TOKEN }}
+                title: Heat ${{ inputs.release_version }} - Release
+                body: |
+                  Pre-release branch for Heat ${{ inputs.release_version }}.
+                  Any release work should be done on this branch, and then merged into the release branch and main, following git-flow.
+
+                  TODO:
+                  - [x] Update version.py
+                  - [ ] update the Requirements section on README.md if needed
+                  - [ ] Update CITATION.cff if needed
+                  - [ ] Ensure the Changelog is up to date
+
+                  [1]: https://github.com/peter-evans/create-pull-request
+                labels: chore
+                draft: false
+            env:
+                PR_BRANCH: pre-release/${{ inputs.release_version }}
+          - name: Create PR to main from branch
+            uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+            with:
+                base: 'main'
+                branch: ${{ env.PR_BRANCH}}
+                delete-branch: true
+                token: ${{ secrets.GITHUB_TOKEN }}
+                title: Heat ${{ inputs.release_version }} - Main
+                body: |
+                  Pre-release branch for Heat ${{ inputs.release_version }}.
+                  Any release work should be done on this branch, and then merged into the release branch and main, following git-flow.
+
+                  TODO:
+                  - [x] Update version.py
+                  - [ ] update the Requirements section on README.md if needed
+                  - [ ] Update CITATION.cff if needed
+                  - [ ] Ensure the Changelog is up to date
+
+                  [1]: https://github.com/peter-evans/create-pull-request
+                labels: chore
+                draft: false
+            env:
+                PR_BRANCH: pre-release/${{ inputs.release_version }}
+
