@@ -3,9 +3,6 @@ name: Release Drafter
 on:
   pull_request_target:
     types: [opened, reopened, synchronize]
-    branches:
-      - release
-      - pre-release/*
   push:
     branches:
       - release
@@ -26,6 +23,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          commitish: ${{ github.ref_name }}
+          commitish: 'release'
           name: ${{ github.ref_name }} - Draft release
           config-name: rd-release-config.yml
