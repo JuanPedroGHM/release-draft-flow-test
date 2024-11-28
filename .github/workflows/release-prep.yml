@@ -75,7 +75,6 @@ jobs:
 
           [1]: https://github.com/peter-evans/create-pull-request" \
           --label chore \
-          --draft false
           
           # Create PR for main
           gh pr create --base main \
