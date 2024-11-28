@@ -75,11 +75,11 @@ jobs:
           - [ ] Ensure the Changelog is up to date
 
           [1]: https://github.com/peter-evans/create-pull-request" \
-          --label chore \
+          --label invalid \
           
           # Create PR for main
           gh pr create --base main \
           --head ${{ env.PR_BRANCH }} \
           --title "Heat ${{ env.VERSION }} - Main" \
           --body "Copy of latest pre-release PR targeting release." \
-          --label chore
+          --label invalid
