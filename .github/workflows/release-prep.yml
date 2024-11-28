@@ -33,6 +33,7 @@ jobs:
         env:
           PR_BRANCH: pre-release/${{ inputs.release_version }}
           VERSION: ${{ inputs.release_version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create branch
           git checkout -b pre-release/${VERSION}
